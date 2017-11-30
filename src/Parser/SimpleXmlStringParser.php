@@ -217,10 +217,10 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
 
         libxml_clear_errors();
 
-        $disableEntityLoader = null;
+        $disableEntityLoader = $this->getDisableEntityLoader();
 
-        if (true === is_bool($this->getDisableEntityLoader())) {
-            $disableEntityLoader = libxml_disable_entity_loader($this->getDisableEntityLoader());
+        if (true === is_bool($disableEntityLoader)) {
+            $disableEntityLoader = libxml_disable_entity_loader($disableEntityLoader);
         }
 
         $element = simplexml_load_string(
