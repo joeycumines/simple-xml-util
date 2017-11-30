@@ -1,0 +1,30 @@
+{
+    "name": "joeycumines\/simple-xml-util",
+    "description": "Utilities to improve maintainability of code that relies on PHP's simplexml_load_string.",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Joey Cumines",
+            "email": "joeycumines@gmail.com"
+        }
+    ],
+    "support": {
+        "source": "https:\/\/github.com\/joeycumines\/simple-xml-util",
+        "issues": "https:\/\/github.com\/joeycumines\/simple-xml-util\/issues"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "JoeyCumines\\SimpleXmlUtil\\": "src\/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\JoeyCumines\\SimpleXmlUtil\\": "tests\/"
+        }
+    }
+}
