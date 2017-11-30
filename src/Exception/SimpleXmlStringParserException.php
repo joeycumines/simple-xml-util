@@ -92,7 +92,7 @@ class SimpleXmlStringParserException extends \RuntimeException
             $match = false;
 
             foreach ($value as $k => $v) {
-                if (true === in_array($k, ['level', 'code', 'column', 'message', 'file', 'line'])) {
+                if (true === in_array((string)$k, ['level', 'code', 'column', 'message', 'file', 'line'], true)) {
                     $match = true;
                 }
 
