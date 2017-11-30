@@ -122,48 +122,48 @@ EOT
 
     private function dummyErrors()
     {
-        return array (
-                0 =>
-                    $this->createLibXMLError(array(
-                        'level' => 3,
-                        'code' => 38,
-                        'column' => 19,
-                        'message' => 'Unescaped \'<\' not allowed in attributes values
+        return array(
+            0 =>
+                $this->createLibXMLError(array(
+                    'level' => 3,
+                    'code' => 38,
+                    'column' => 19,
+                    'message' => 'Unescaped \'<\' not allowed in attributes values
 ',
-                        'file' => '',
-                        'line' => 1,
-                    )),
-                1 =>
-                    $this->createLibXMLError(array(
-                        'level' => 3,
-                        'code' => 65,
-                        'column' => 19,
-                        'message' => 'attributes construct error
+                    'file' => '',
+                    'line' => 1,
+                )),
+            1 =>
+                $this->createLibXMLError(array(
+                    'level' => 3,
+                    'code' => 65,
+                    'column' => 19,
+                    'message' => 'attributes construct error
 ',
-                        'file' => '',
-                        'line' => 1,
-                    )),
-                2 =>
-                    $this->createLibXMLError(array(
-                        'level' => 3,
-                        'code' => 73,
-                        'column' => 19,
-                        'message' => 'Couldn\'t find end of Start Tag a line 1
+                    'file' => '',
+                    'line' => 1,
+                )),
+            2 =>
+                $this->createLibXMLError(array(
+                    'level' => 3,
+                    'code' => 73,
+                    'column' => 19,
+                    'message' => 'Couldn\'t find end of Start Tag a line 1
 ',
-                        'file' => '',
-                        'line' => 1,
-                    )),
-                3 =>
-                    $this->createLibXMLError(array(
-                        'level' => 3,
-                        'code' => 5,
-                        'column' => 19,
-                        'message' => 'Extra content at the end of the document
+                    'file' => '',
+                    'line' => 1,
+                )),
+            3 =>
+                $this->createLibXMLError(array(
+                    'level' => 3,
+                    'code' => 5,
+                    'column' => 19,
+                    'message' => 'Extra content at the end of the document
 ',
-                        'file' => '',
-                        'line' => 1,
-                    )),
-            );
+                    'file' => '',
+                    'line' => 1,
+                )),
+        );
     }
 
     public function testGetLibXmlErrorsAsString()
@@ -208,6 +208,16 @@ EOT
         ];
     }
 
+    private function convertErrorsToComparable(array $errors)
+    {
+        $result = [];
+        foreach ($errors as $error) {
+            $this->assertTrue($error instanceof LibXMLError);
+            $result[] = (array)$error;
+        }
+        return $result;
+    }
+
     public function testParseError()
     {
         try {
@@ -217,6 +227,11 @@ EOT
             $expected = 'unable to parse xml string like `<a bad-param=">ONE</a>`, internal error(s):' . PHP_EOL . PHP_EOL . self::BAD_XML_ERROR;
             $expected = trim((string)$expected);
             $this->assertEquals($expected, $e->getMessage());
+
+            $errorsExpected = $this->convertErrorsToComparable($this->dummyErrors());
+            $errorsActual = $this->convertErrorsToComparable($e->getErrors());
+
+            $this->assertTrue($errorsActual === $errorsExpected);
         }
     }
 
