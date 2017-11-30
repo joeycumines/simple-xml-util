@@ -4,7 +4,6 @@ namespace JoeyCumines\SimpleXmlUtil\Parser;
 
 use JoeyCumines\SimpleXmlUtil\Exception\SimpleXmlStringParserException;
 use JoeyCumines\SimpleXmlUtil\Interfaces\SimpleXmlStringParserInterface;
-use LibXMLError;
 
 class SimpleXmlStringParser implements SimpleXmlStringParserInterface
 {
@@ -262,8 +261,9 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
      * NOTES:
      * - if provided, $xml will be used to show the line the error occurred (only works for fixed-width col)
      * - there will be one trailing newline
+     * - errors that are not instances of \LibXMLError will be ignored
      *
-     * @param array $errors
+     * @param \LibXMLError[] $errors
      * @param string|null $xml
      *
      * @return string
@@ -277,7 +277,7 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
         }
 
         foreach ($errors as $error) {
-            if (!$error instanceof LibXMLError) {
+            if (!$error instanceof \LibXMLError) {
                 continue;
             }
 
@@ -302,12 +302,12 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
      * - if provided, $xml will be used to show the line the error occurred (only works for fixed-width col)
      * - there will be one trailing newline
      *
-     * @param LibXMLError $error
+     * @param \LibXMLError $error
      * @param string|array|null $xml
      *
      * @return string
      */
-    public static function getLibXmlErrorAsString(LibXMLError $error, $xml = null)
+    public static function getLibXmlErrorAsString(\LibXMLError $error, $xml = null)
     {
         $result = '';
 

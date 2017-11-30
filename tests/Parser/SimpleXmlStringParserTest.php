@@ -4,7 +4,6 @@ namespace Tests\JoeyCumines\SimpleXmlUtil\Parser;
 
 use JoeyCumines\SimpleXmlUtil\Exception\SimpleXmlStringParserException;
 use JoeyCumines\SimpleXmlUtil\Parser\SimpleXmlStringParser;
-use LibXMLError;
 use PHPUnit\Framework\TestCase;
 
 class SimpleXmlStringParserTest extends TestCase
@@ -57,9 +56,9 @@ EOT;
 
     public function getLibXmlErrorAsStringProvider()
     {
-        $error1 = new LibXMLError();
+        $error1 = new \LibXMLError();
 
-        $error2 = new LibXMLError();
+        $error2 = new \LibXMLError();
         $error2->level = LIBXML_ERR_WARNING;
         $error2->code = 223;
         $error2->column = 4;
@@ -113,7 +112,7 @@ EOT
 
     private function createLibXMLError(array $data)
     {
-        $result = new LibXMLError();
+        $result = new \LibXMLError();
         foreach ($data as $k => $v) {
             $result->{$k} = $v;
         }
@@ -212,7 +211,7 @@ EOT
     {
         $result = [];
         foreach ($errors as $error) {
-            $this->assertTrue($error instanceof LibXMLError);
+            $this->assertTrue($error instanceof \LibXMLError);
             $result[] = (array)$error;
         }
         return $result;
