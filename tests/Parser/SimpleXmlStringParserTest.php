@@ -125,20 +125,11 @@ EOT
         ];
     }
 
-    private function createLibXMLError(array $data)
-    {
-        $result = new \LibXMLError();
-        foreach ($data as $k => $v) {
-            $result->{$k} = $v;
-        }
-        return $result;
-    }
-
     private function dummyErrors()
     {
         return array(
             0 =>
-                $this->createLibXMLError(array(
+                SimpleXmlStringParserException::valueToLibXmlError(array(
                     'level' => 3,
                     'code' => 38,
                     'column' => 19,
@@ -148,7 +139,7 @@ EOT
                     'line' => 1,
                 )),
             1 =>
-                $this->createLibXMLError(array(
+                SimpleXmlStringParserException::valueToLibXmlError(array(
                     'level' => 3,
                     'code' => 65,
                     'column' => 19,
@@ -158,7 +149,7 @@ EOT
                     'line' => 1,
                 )),
             2 =>
-                $this->createLibXMLError(array(
+                SimpleXmlStringParserException::valueToLibXmlError(array(
                     'level' => 3,
                     'code' => 73,
                     'column' => 19,
@@ -168,7 +159,7 @@ EOT
                     'line' => 1,
                 )),
             3 =>
-                $this->createLibXMLError(array(
+                SimpleXmlStringParserException::valueToLibXmlError(array(
                     'level' => 3,
                     'code' => 5,
                     'column' => 19,
