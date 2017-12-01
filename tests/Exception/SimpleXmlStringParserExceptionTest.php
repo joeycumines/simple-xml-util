@@ -95,4 +95,31 @@ class SimpleXmlStringParserExceptionTest extends TestCase
             ],
         ];
     }
+
+    public function testConstruct()
+    {
+        $libXmlError = new \LibXMLError();
+        $errors = [
+            $libXmlError,
+            new \stdClass(),
+            'message!',
+        ];
+        $message = 'e_m';
+        $code = 512;
+        $previous = new \Exception();
+
+        $e = new SimpleXmlStringParserException($errors, $message, $code, $previous);
+
+        $this->assertCount(2, $e->getErrors());
+        $this->assertTrue([0, 1] === array_keys($e->getErrors()));
+        $errors = $e->getErrors();
+        $this->assertTrue($libXmlError === $errors[0]);
+        $error2 = (array)($errors[1]);
+        $this->assertCount(1, $error2);
+        $this->assertTrue(array_key_exists('message', $error2));
+        $this->assertEquals('message!', $error2['message']);
+        $this->assertEquals('e_m', $e->getMessage());
+        $this->assertEquals(512, $e->getCode());
+        $this->assertTrue($e->getPrevious() === $previous);
+    }
 }

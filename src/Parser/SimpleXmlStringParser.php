@@ -240,13 +240,11 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
             libxml_disable_entity_loader($disableEntityLoader);
         }
 
-        // clear any errors (we generated) then reset the flag to use internal errors to it's previous value
+        // clear any errors we generated
         libxml_clear_errors();
-        libxml_use_internal_errors($useErrors);
 
-        if (false === is_array($errors)) {
-            $errors = [];
-        }
+        // reset the flag to use internal errors to it's previous state
+        libxml_use_internal_errors($useErrors);
 
         if (!$element instanceof \SimpleXMLElement || count($errors)) {
             // summarize / truncate the data for the message, to a max of 80 characters
@@ -257,7 +255,7 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
             }
 
             throw new SimpleXmlStringParserException(
-                $errors,
+                true === is_array($errors) ? $errors : [],
                 trim(
                     sprintf(
                         'unable to parse xml string like `%s`, internal error(s):%s%s%s',

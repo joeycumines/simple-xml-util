@@ -95,6 +95,9 @@ EOT;
 
         $xml1 = "NOT\n1 2 3 4 5\nNOT";
 
+        $error3 = new \LibXMLError();
+        $error3->level = LIBXML_ERR_ERROR;
+
         return [
             [
                 $error1,
@@ -109,11 +112,11 @@ Unknown Error (?):
 EOT
             ],
             [
-                $error1,
+                $error3,
                 $xml1,
                 <<<EOT
 --------------------------------------------
-Unknown Error (?): 
+Error (?): 
   Line: 
   Column: 
 --------------------------------------------
@@ -194,12 +197,17 @@ EOT
         $this->assertEquals('No Libxml Internal Errors!' . PHP_EOL, SimpleXmlStringParser::getLibXmlErrorsAsString([]));
     }
 
+    public function testGetLibXmlErrorsAsStringNonErrors()
+    {
+        $this->assertEquals('No Libxml Internal Errors!' . PHP_EOL, SimpleXmlStringParser::getLibXmlErrorsAsString([1, 2, 3]));
+    }
+
     /**
      * @param array ...$args List of all args to parse sans-xml.
      *
      * @dataProvider parseProvider
      */
-    public function testParse(...$args)
+    public function testParseXmlString(...$args)
     {
         $input = '<a><b></b><c></c></a>';
 
@@ -240,7 +248,7 @@ EOT
      *
      * @dataProvider parseErrorProvider
      */
-    public function testParseError($useInternalErrors)
+    public function testParseXmlStringError($useInternalErrors)
     {
         libxml_use_internal_errors($useInternalErrors);
 
@@ -274,7 +282,7 @@ EOT
         ];
     }
 
-    public function testParseErrorConcat()
+    public function testParseXmlStringErrorConcat()
     {
         try {
             (new SimpleXmlStringParser())->parseXmlString('<>-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-123456789abcdefghijklmnop');
@@ -289,7 +297,7 @@ EOT
      * Ensure that the multi-byte summary of the xml input works correctly, which is skipped if mbstring is not
      * available. The other tests should pass even without them, as it falls back to the non-mb variants.
      */
-    public function testParseErrorConcatMultiByte()
+    public function testParseXmlStringErrorConcatMultiByte()
     {
         if (false === extension_loaded('mbstring')) {
             $this->markTestSkipped(
@@ -324,7 +332,7 @@ EOT
      *
      * @dataProvider parseInternalStateProvider
      */
-    public function testParseInternalStateOnError(
+    public function testParseXmlStringInternalStateOnError(
         $useInternalErrorsOld,
         $disableEntityLoaderOld,
         $disableEntityLoaderNew
@@ -354,7 +362,7 @@ EOT
      *
      * @dataProvider parseInternalStateProvider
      */
-    public function testParseInternalState(
+    public function testParseXmlStringInternalState(
         $useInternalErrorsOld,
         $disableEntityLoaderOld,
         $disableEntityLoaderNew
@@ -500,6 +508,7 @@ EOT
             ['className', -1213, false],
             ['className', null, false],
             ['className', \SimpleXMLElement::class, true],
+            ['className', \Exception::class, false],
             ['options', 0, true],
             ['options', 128, true],
             ['options', LIBXML_BIGLINES, true],
@@ -518,5 +527,11 @@ EOT
             ['disableEntityLoader', true, true],
             ['disableEntityLoader', 123, false],
         ];
+    }
+
+    public function testParseXmlStringNonString()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (new SimpleXmlStringParser())->parseXmlString(123);
     }
 }
