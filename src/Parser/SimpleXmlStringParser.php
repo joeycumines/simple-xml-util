@@ -22,6 +22,9 @@ use JoeyCumines\SimpleXmlUtil\Interfaces\SimpleXmlStringParserInterface;
 
 class SimpleXmlStringParser implements SimpleXmlStringParserInterface
 {
+    /** @var bool|null If the 'mbstring' extension is loaded, checked the first time it's needed. */
+    private static $mbstringEnabled = null;
+
     /** @var string Arg 2 for simplexml_load_string. */
     private $className;
 
@@ -248,9 +251,9 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
         if (!$element instanceof \SimpleXMLElement || count($errors)) {
             // summarize / truncate the data for the message, to a max of 80 characters
             $summary = $data;
-            if (mb_strlen($data) > 80) {
+            if (self::mbStrLen($data) > 80) {
                 // 0-64...(-11)-(-0)
-                $summary = mb_substr($summary, 0, 65) . '...' . mb_substr($summary, mb_strlen($data) - 12);
+                $summary = self::mbSubStr($summary, 0, 65) . '...' . self::mbSubStr($summary, self::mbStrLen($data) - 12);
             }
 
             throw new SimpleXmlStringParserException(
@@ -394,5 +397,29 @@ class SimpleXmlStringParser implements SimpleXmlStringParserInterface
 
         $result .= PHP_EOL . '--------------------------------------------' . PHP_EOL;
         return $result;
+    }
+
+    private static function isMbstringEnabled()
+    {
+        if (null === self::$mbstringEnabled) {
+            self::$mbstringEnabled = extension_loaded('mbstring');
+        }
+        return (bool)(self::$mbstringEnabled);
+    }
+
+    private static function mbSubStr(...$args)
+    {
+        if (false === self::isMbstringEnabled()) {
+            return substr(...$args);
+        }
+        return mb_substr(...$args);
+    }
+
+    private static function mbStrLen(...$args)
+    {
+        if (false === self::isMbstringEnabled()) {
+            return strlen(...$args);
+        }
+        return mb_strlen(...$args);
     }
 }
