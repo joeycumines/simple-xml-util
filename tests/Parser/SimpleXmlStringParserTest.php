@@ -436,4 +436,87 @@ EOT
             ],
         ];
     }
+
+    public function testConstructorDefaults()
+    {
+        $parser = new SimpleXmlStringParser();
+        $this->assertNull($parser->getDisableEntityLoader());
+        $this->assertEquals('', $parser->getNs());
+        $this->assertEquals(\SimpleXMLElement::class, $parser->getClassName());
+        $this->assertFalse($parser->isPrefix());
+        $this->assertEquals(0, $parser->getOptions());
+    }
+
+    public function testConstructor()
+    {
+        $parser = new SimpleXmlStringParser(
+            DummySimpleXMLElementSubclass::class,
+            123,
+            'ns',
+            true,
+            false
+        );
+        $this->assertEquals(DummySimpleXMLElementSubclass::class, $parser->getClassName());
+        $this->assertEquals(123, $parser->getOptions());
+        $this->assertEquals('ns', $parser->getNs());
+        $this->assertTrue($parser->isPrefix());
+        $this->assertFalse($parser->getDisableEntityLoader());
+        $this->assertNotNull($parser->getDisableEntityLoader());
+    }
+
+    /**
+     * @param $property
+     * @param $value
+     * @param $success
+     *
+     * @dataProvider getterSetterProvider
+     */
+    public function testGetterSetter($property, $value, $success)
+    {
+        $getter = 'get' . $property;
+        $setter = 'set' . $property;
+        if (false === method_exists(SimpleXmlStringParser::class, $getter)) {
+            $getter = 'is' . $property;
+        }
+
+        $parser = new SimpleXmlStringParser();
+
+        $previous = call_user_func([$parser, $getter]);
+
+        try {
+            $this->assertTrue($parser === call_user_func([$parser, $setter], $value));
+            $this->assertTrue($success);
+            $this->assertEquals($value, call_user_func([$parser, $getter]));
+        } catch (\InvalidArgumentException $e) {
+            $this->assertFalse($success);
+            $this->assertEquals($previous, call_user_func([$parser, $getter]));
+        }
+    }
+
+    public function getterSetterProvider()
+    {
+        return [
+            ['className', DummySimpleXMLElementSubclass::class, true],
+            ['className', -1213, false],
+            ['className', null, false],
+            ['className', \SimpleXMLElement::class, true],
+            ['options', 0, true],
+            ['options', 128, true],
+            ['options', LIBXML_BIGLINES, true],
+            ['options', null, false],
+            ['options', 'NO', false],
+            ['ns', 0, false],
+            ['ns', 123.231, false],
+            ['ns', '', true],
+            ['ns', 'prefix', true],
+            ['prefix', true, true],
+            ['prefix', false, true],
+            ['prefix', 0, false],
+            ['prefix', null, false],
+            ['disableEntityLoader', null, true],
+            ['disableEntityLoader', false, true],
+            ['disableEntityLoader', true, true],
+            ['disableEntityLoader', 123, false],
+        ];
+    }
 }
