@@ -186,7 +186,7 @@ EOT
     public function testGetLibXmlErrorsAsString()
     {
         $actual = SimpleXmlStringParser::getLibXmlErrorsAsString($this->dummyErrors(), self::BAD_XML);
-        $this->assertEquals(self::BAD_XML_ERROR, $actual);
+        $this->assertEquals($this->toPhpEol(self::BAD_XML_ERROR), $actual);
     }
 
     public function testGetLibXmlErrorsAsStringEmpty()
