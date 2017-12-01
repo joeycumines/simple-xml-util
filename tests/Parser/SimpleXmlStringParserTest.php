@@ -262,4 +262,34 @@ EOT
             $this->assertTrue(strpos($e->getMessage(), $expectedStart) === 0);
         }
     }
+
+    /**
+     * Ensure that the multi-byte summary of the xml input works correctly, which is skipped if mbstring is not
+     * available. The other tests should pass even without them, as it falls back to the non-mb variants.
+     */
+    public function testParseErrorConcatMultiByte()
+    {
+        if (false === extension_loaded('mbstring')) {
+            $this->markTestSkipped(
+                'the mbstring extension is not available'
+            );
+        }
+
+        $input = '<>-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字漢字ghijklmnop';
+        $subStr = substr($input, 0, 65) . '...' . substr($input, strlen($input) - 12);
+        $this->assertEquals(80, strlen($subStr));
+        $mbSubStr = mb_substr($input, 0, 65) . '...' . mb_substr($input, mb_strlen($input) - 12);
+        $this->assertEquals(80, mb_strlen($mbSubStr));
+
+        $this->assertNotEquals($subStr, $mbSubStr);
+        $this->assertEquals('<>-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+漢...漢字ghijklmnop', $mbSubStr);
+
+        try {
+            (new SimpleXmlStringParser())->parseXmlString($input);
+            $this->fail('expected an exception');
+        } catch (SimpleXmlStringParserException $e) {
+            $expectedStart = 'unable to parse xml string like `' . $mbSubStr . '`, internal error(s):';
+            $this->assertTrue(mb_strpos($e->getMessage(), $expectedStart) === 0);
+        }
+    }
 }
