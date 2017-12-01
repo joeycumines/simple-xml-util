@@ -379,6 +379,83 @@ EOT
         $this->assertEquals($disableEntityLoaderOld, libxml_disable_entity_loader($disableEntityLoaderOld));
     }
 
+    /**
+     * @link https://stackoverflow.com/a/29864193
+     *
+     * @param $useInternalErrorsOld
+     * @param $disableEntityLoaderOld
+     * @param $disableEntityLoaderNew
+     *
+     * @dataProvider parseInternalStateProvider
+     */
+    public function testParseXmlStringNoXxe(
+        $useInternalErrorsOld,
+        $disableEntityLoaderOld,
+        $disableEntityLoaderNew
+    ) {
+        libxml_use_internal_errors($useInternalErrorsOld);
+        libxml_disable_entity_loader($disableEntityLoaderOld);
+
+        $parser = (new SimpleXmlStringParser())
+            ->setDisableEntityLoader($disableEntityLoaderNew)
+            ->setOptions(LIBXML_NOENT);
+
+        $input = <<<XML
+<!DOCTYPE foo [
+        <!ELEMENT foo ANY >
+        <!ENTITY xxe SYSTEM "data://text/plain,test" >]>
+<foo><val>&xxe;</val></foo>
+XML;
+
+        try {
+            $output = $parser->parseXmlString($input);
+            $this->assertTrue(false === $disableEntityLoaderNew || (null === $disableEntityLoaderNew && false === $disableEntityLoaderOld));
+            $this->assertEquals('test', $output->val);
+        } catch (SimpleXmlStringParserException $e) {
+            $this->assertTrue(true === $disableEntityLoaderNew || (null === $disableEntityLoaderNew && true === $disableEntityLoaderOld));
+        }
+
+        $this->assertEquals($useInternalErrorsOld, libxml_use_internal_errors($useInternalErrorsOld));
+        $this->assertEquals($disableEntityLoaderOld, libxml_disable_entity_loader($disableEntityLoaderOld));
+    }
+
+    /**
+     * @link https://stackoverflow.com/a/29864193
+     *
+     * @param $useInternalErrorsOld
+     * @param $disableEntityLoaderOld
+     * @param $disableEntityLoaderNew
+     *
+     * @dataProvider parseInternalStateProvider
+     */
+    public function testParseXmlStringNoXxeControl(
+        $useInternalErrorsOld,
+        $disableEntityLoaderOld,
+        $disableEntityLoaderNew
+    ) {
+        libxml_use_internal_errors($useInternalErrorsOld);
+        libxml_disable_entity_loader($disableEntityLoaderOld);
+
+        $parser = (new SimpleXmlStringParser())
+            ->setDisableEntityLoader($disableEntityLoaderNew);
+
+        $input = <<<XML
+<!DOCTYPE foo [
+        <!ELEMENT foo ANY >
+        <!ENTITY xxe SYSTEM "data://text/plain,test" >]>
+<foo><val>&xxe;</val></foo>
+XML;
+
+        // without the noent flag it won't fail
+        $output = $parser->parseXmlString($input);
+
+        // but there won't be any bad values anyway
+        $this->assertTrue($output->val instanceof \SimpleXMLElement);
+
+        $this->assertEquals($useInternalErrorsOld, libxml_use_internal_errors($useInternalErrorsOld));
+        $this->assertEquals($disableEntityLoaderOld, libxml_disable_entity_loader($disableEntityLoaderOld));
+    }
+
     public function parseInternalStateProvider()
     {
         return [
