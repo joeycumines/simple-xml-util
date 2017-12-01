@@ -511,7 +511,7 @@ EOT
             ['className', \Exception::class, false],
             ['options', 0, true],
             ['options', 128, true],
-            ['options', LIBXML_BIGLINES, true],
+            ['options', LIBXML_NOERROR, true],
             ['options', null, false],
             ['options', 'NO', false],
             ['ns', 0, false],
