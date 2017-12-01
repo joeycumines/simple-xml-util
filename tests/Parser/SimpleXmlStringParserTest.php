@@ -235,8 +235,20 @@ EOT
         return $result;
     }
 
-    public function testParseError()
+    /**
+     * @param $useInternalErrors
+     *
+     * @dataProvider parseErrorProvider
+     */
+    public function testParseError($useInternalErrors)
     {
+        libxml_use_internal_errors($useInternalErrors);
+
+        if (true === $useInternalErrors) {
+            $this->assertTrue(!simplexml_load_string(self::BAD_XML) instanceof \SimpleXMLElement);
+            $this->assertEquals(count($this->dummyErrors()), count(libxml_get_errors()));
+        }
+
         try {
             (new SimpleXmlStringParser())->parseXmlString(self::BAD_XML);
             $this->fail('expected an exception');
@@ -250,6 +262,16 @@ EOT
 
             $this->assertTrue($errorsActual === $errorsExpected);
         }
+
+        $this->assertCount(0, libxml_get_errors());
+    }
+
+    public function parseErrorProvider()
+    {
+        return [
+            [true],
+            [false],
+        ];
     }
 
     public function testParseErrorConcat()
