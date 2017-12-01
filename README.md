@@ -35,7 +35,8 @@ $xmlParser = (new SimpleXmlStringParser())
 
 // use the interface in the service - pre-configured
 
-use JoeyCumines\SimpleXmlUtil\Parser\SimpleXmlStringParser;
+use JoeyCumines\SimpleXmlUtil\Exception\SimpleXmlStringParserException;
+use JoeyCumines\SimpleXmlUtil\Interfaces\SimpleXmlStringParserInterface;
 
 // ...
 
@@ -45,7 +46,7 @@ class SomeService
     private $logger;
 
     public function __construct(
-        SimpleXmlStringParser $xmlParser,
+        SimpleXmlStringParserInterface $xmlParser,
         Logger $logger
     ) {
         $this->xmlParser = $xmlParser;
