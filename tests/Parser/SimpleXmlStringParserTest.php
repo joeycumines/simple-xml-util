@@ -57,6 +57,18 @@ Fatal Error (5): Extra content at the end of the document
 EOT;
 
     /**
+     * Convert all characters (/ sequences), denoting the end of one line, and the beginning of another, to PHP_EOL.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    private function toPhpEol($value)
+    {
+        return preg_replace('/\\R/u', PHP_EOL, $value);
+    }
+
+    /**
      * @param $error
      * @param $xml
      * @param $expected
@@ -66,7 +78,7 @@ EOT;
     public function testGetLibXmlErrorAsString($error, $xml, $expected)
     {
         $actual = SimpleXmlStringParser::getLibXmlErrorAsString($error, $xml);
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($this->toPhpEol($expected), $actual);
     }
 
     public function getLibXmlErrorAsStringProvider()
@@ -231,7 +243,7 @@ EOT
         } catch (SimpleXmlStringParserException $e) {
             $expected = 'unable to parse xml string like `<a bad-param=">ONE</a>`, internal error(s):' . PHP_EOL . PHP_EOL . self::BAD_XML_ERROR;
             $expected = trim((string)$expected);
-            $this->assertEquals($expected, $e->getMessage());
+            $this->assertEquals($this->toPhpEol($expected), $e->getMessage());
 
             $errorsExpected = $this->convertErrorsToComparable($this->dummyErrors());
             $errorsActual = $this->convertErrorsToComparable($e->getErrors());
