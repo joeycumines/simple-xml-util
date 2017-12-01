@@ -292,4 +292,126 @@ EOT
             $this->assertTrue(mb_strpos($e->getMessage(), $expectedStart) === 0);
         }
     }
+
+    /**
+     * Ensure the internal flags have their state reset to their original value.
+     *
+     * @param $useInternalErrorsOld
+     * @param $disableEntityLoaderOld
+     * @param $disableEntityLoaderNew
+     *
+     * @dataProvider parseInternalStateProvider
+     */
+    public function testParseInternalStateOnError(
+        $useInternalErrorsOld,
+        $disableEntityLoaderOld,
+        $disableEntityLoaderNew
+    ) {
+        libxml_use_internal_errors($useInternalErrorsOld);
+        libxml_disable_entity_loader($disableEntityLoaderOld);
+
+        $parser = (new SimpleXmlStringParser())
+            ->setDisableEntityLoader($disableEntityLoaderNew);
+
+        try {
+            $parser->parseXmlString(self::BAD_XML);
+            $this->fail('expected an exception');
+        } catch (SimpleXmlStringParserException $e) {
+        }
+
+        $this->assertEquals($useInternalErrorsOld, libxml_use_internal_errors($useInternalErrorsOld));
+        $this->assertEquals($disableEntityLoaderOld, libxml_disable_entity_loader($disableEntityLoaderOld));
+    }
+
+    /**
+     * Ensure the internal flags have their state reset to their original value.
+     *
+     * @param $useInternalErrorsOld
+     * @param $disableEntityLoaderOld
+     * @param $disableEntityLoaderNew
+     *
+     * @dataProvider parseInternalStateProvider
+     */
+    public function testParseInternalState(
+        $useInternalErrorsOld,
+        $disableEntityLoaderOld,
+        $disableEntityLoaderNew
+    ) {
+        libxml_use_internal_errors($useInternalErrorsOld);
+        libxml_disable_entity_loader($disableEntityLoaderOld);
+
+        $parser = (new SimpleXmlStringParser())
+            ->setDisableEntityLoader($disableEntityLoaderNew);
+
+        $this->assertTrue($parser->parseXmlString('<a></a>') instanceof \SimpleXMLElement);
+
+        $this->assertEquals($useInternalErrorsOld, libxml_use_internal_errors($useInternalErrorsOld));
+        $this->assertEquals($disableEntityLoaderOld, libxml_disable_entity_loader($disableEntityLoaderOld));
+    }
+
+    public function parseInternalStateProvider()
+    {
+        return [
+            [
+                true,
+                true,
+                true,
+            ],
+            [
+                false,
+                true,
+                true,
+            ],
+            [
+                true,
+                false,
+                true,
+            ],
+            [
+                true,
+                true,
+                false,
+            ],
+            [
+                false,
+                false,
+                false,
+            ],
+            [
+                true,
+                false,
+                false,
+            ],
+            [
+                false,
+                true,
+                false,
+            ],
+            [
+                false,
+                false,
+                true,
+            ],
+            [
+                true,
+                true,
+                null,
+            ],
+            [
+                false,
+                true,
+                null,
+            ],
+            [
+                true,
+                false,
+                null,
+            ],
+            [
+                false,
+                false,
+                null,
+            ],
+        ];
+    }
 }
